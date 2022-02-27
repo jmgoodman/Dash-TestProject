@@ -45,5 +45,5 @@ I used:
 
 ## TODO
 * Finish tutorial, especially the stuff about pretty styling
-* Figure out deployment solution (Google Cloud + Kubernetes?)
+* Figure out deployment solution (Google Cloud + Kubernetes? Might be overkill... tutorial suggests Heroku, something the [plotly website](https://dash.plotly.com/deployment) corroborates)
 * Add data of my choosing (maybe yet another covid dashboard? figure out how to query the [github jhu CSSE repository](https://github.com/CSSEGISandData/COVID-19) or some API with the data you want)
