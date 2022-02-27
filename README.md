@@ -27,7 +27,7 @@ I used:
     * Select them and download any dependencies to your environment
 * Back in VS Code, set your python interpreter
     * Ctrl+Shift+P, "Python: Select Interpreter"
-    * choose your conda environment you just created
+    * choose your conda environment you just created, it should simply show it to you in a dropdown list, if not I apologize for the frustration :(
 * Before running any Python, test VS Code's Powershell terminal
     * Ctrl+Shift+\`
     * `conda --version` in the terminal that should pop up on the bottom of the window
@@ -41,3 +41,4 @@ I used:
     * you may also need to run `Set-ExecutionPolicy -ExecutionPolicy Unrestricted`
         * BEFORE DOING SO: check permissions with `Get-ExecutionPolicy`. This should return `Unrestricted` if all is good to go.
 * Run `app.py` by navigating to the script in VS code, clicking the ol' play button, and pray the terminal doesn't throw any errors. All the steps listed above should get you around any errors I ran into when setting up the environment.
+* If anything goes screwy at any stage, never forget the golden rule of debugging: turn it off and on again. Restart VS Code, reinstall packages / software, reboot machines when all else fails.
