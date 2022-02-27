@@ -42,3 +42,8 @@ I used:
         * BEFORE DOING SO: check permissions with `Get-ExecutionPolicy`. This should return `Unrestricted` if all is good to go.
 * Run `app.py` by navigating to the script in VS code, clicking the ol' play button, and pray the terminal doesn't throw any errors. All the steps listed above should get you around any errors I ran into when setting up the environment.
 * If anything goes screwy at any stage, never forget the golden rule of debugging: turn it off and on again. Restart VS Code, reinstall packages / software, reboot machines when all else fails.
+
+## TODO
+* Finish tutorial, especially the stuff about pretty styling
+* Figure out deployment solution (Google Cloud + Kubernetes?)
+* Add data of my choosing (maybe yet another covid dashboard? figure out how to query the [github jhu CSSE repository](https://github.com/CSSEGISandData/COVID-19) or some API with the data you want)
