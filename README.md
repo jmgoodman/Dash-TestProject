@@ -22,7 +22,7 @@ I used:
     * Name it whatever you please
     * You may need to open an Anaconda prompt (Windows search bar "Anaconda Prompt") and enter `conda init` and `conda activate [env-name]`
     * Top of panel just to the right: change dropdown to "Not Installed", then search for packages:
-        * Dash:
+        * Dash
         * Pandas
     * Select them and download any dependencies to your environment
 * Back in VS Code, set your python interpreter
