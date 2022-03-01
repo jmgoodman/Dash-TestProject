@@ -43,6 +43,12 @@ I used:
 * Run `app.py` by navigating to the script in VS code, clicking the ol' play button, and pray the terminal doesn't throw any errors. All the steps listed above should get you around any errors I ran into when setting up the environment.
 * If anything goes screwy at any stage, never forget the golden rule of debugging: turn it off and on again. Restart VS Code, reinstall packages / software, reboot machines when all else fails.
 
+## Actually...
+* ditch anaconda
+* follow the steps in the tutorial when it comes to setting up your preferred environment (& hence, interpreter)
+* you will need the venv folder in the end to deploy to heroku
+* and it's actually way easier than clunky ol' anaconda & lets you use good ol' pip install
+
 ## TODO
 * Finish tutorial, especially the stuff about pretty styling
 * Figure out deployment solution (Google Cloud + Kubernetes? Might be overkill... tutorial suggests Heroku, something the [plotly website](https://dash.plotly.com/deployment) corroborates)
