@@ -56,3 +56,7 @@ I used:
 * Maybe even convert those data to a filesystem for SQL queries via php or smth
 * go through [this](https://deeplearning.neuromatch.io/tutorials/W2D5_GenerativeModels/student/W2D5_Tutorial4.html?highlight=deploy) other tutorial to *really* grok what's going on (a lot of similar things going on, except it uses Flask directly, covers some complications if one uses notebooks & colab for development & testing, mentions [ngrok](https://ngrok.com/) as a solution to those problems, and it at least mentions django)
 * speaking of django, try this tutorial: https://docs.djangoproject.com/en/4.0/intro/tutorial01/
+
+## NOTE
+heroku only accepts very specific versions of python: https://devcenter.heroku.com/articles/python-support
+if you don't use one of these, heroku will not deploy your app.
