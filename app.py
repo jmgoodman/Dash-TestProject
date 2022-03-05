@@ -1,132 +1,199 @@
-# %%
 import dash
-import dash_core_components as dcc # from dash import dcc
-import dash_html_components as html # from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 import pandas as pd
-from datetime import timedelta
 import numpy as np
+from dash.dependencies import Output, Input # okay this is a dash thing. weird.
 
-# foreward: find your preferred emoji favicon here: https://favicon.io/emoji-favicons/
-# download it and stuff at LEAST the .ico file into your assets folder, which then gets served automatically
+# app also has loads of text and un-extended files tied to it
+# these are necessary for heroku to run
+# see this for the Procfile documentation (syntax, etc): https://devcenter.heroku.com/articles/procfile
+# see the linked tutorial for info on the requirements and runtime text files
 
-data = pd.read_csv("avocado.csv") # https://www.kaggle.com/neuromusic/avocado-prices
-data = data.query("type == 'conventional' and region == 'Albany'")
+# remove annoying warning: https://stackoverflow.com/questions/20625582/how-to-deal-with-settingwithcopywarning-in-pandas
+pd.options.mode.chained_assignment = None  # default='warn'
+
+data = pd.read_csv("avocado.csv")
 data["Date"] = pd.to_datetime(data["Date"], format="%Y-%m-%d")
-data.sort_values("Date", inplace=True) # inplace = transform original data, don't make a copy
+data.sort_values("Date", inplace=True)
 
-# get rolling averages
-data["RollingAveragePrice"] = data["AveragePrice"].rolling(4,min_periods=1).mean()
-data["RollingAverageVolume"] = data["Total Volume"].rolling(4,min_periods=1).mean()
-
-
-# these data could stand to be smoothed for visual appeal...
-# ...and a cursory glance suggests uniform sampling
-# so, I could probably just use out-of-the-box smoothing routines
-# ...except pandas rolling with datetime argument handles nonuniform sampling out-of-the-box too, I think?
-# ehhh it's a little more complicated than that. see: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rolling.html
-# just assume uniform weekly sampling and your 4-long window for it, mkay?
-# oh HOLY shit the behavior of pandas.rolling is fucking BAFFLING. Sometimes it works, sometimes it shits itself, it all depends on which combinations of non-numeric columns I decide to leave in or not, and I can't make heads or tails of why it can't just consistently ignore non-numeric columns without bugging the hell out
-# but whatever, it works on single columns just fine, so just... apply it when querying those columns below, instead of trying the super buggy operation of applying it to the whole dataframe
-# OR, do it here first so you can plot both at the same time
-# %%
-# add external stylesheet info, add it as an optional second input to dash.Dash
-"""
 external_stylesheets = [
     {
         "href": "https://fonts.googleapis.com/css2?"
-                "family=Lato:wght@400;700&display=swap",
+        "family=Lato:wght@400;700&display=swap",
         "rel": "stylesheet",
     },
-] # so... is this a list of 1 dict? it seems like this framework loves to think of things as lists of dicts (I imagine dicts are how html tags are stored, and naturally you might want to specify a list of html elements for some parts, hence list-of-dicts conventions for at least some parts of the framework, which I imagine percolates elsewhere for, at the very least, consistency's sake. feels clunky though.)
-"""
-# print("Hello""World") # test, just appends the two strings
-external_stylesheets = [
-    dict([
-        ('href','https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap'),
-        ('rel','stylesheet')
-    ])
-] # note: the split into two strings earlier didn't do anything, it was just a way to try and make it neater by taking advantage of automatic concatenation of adjacent strings, then splitting them up onto different lines.
-# so this is, indeed, equivalent. idk what this does yet, it doesn't seem to do anything.
-
-# print(__name__) # debug / testing, prints __main__ when app.py is a top-level call and not imported from a script higher up in the chain. I am dumb and do not yet see the utility of this, but it seems awfully fundamental. Its typical use cases seem related to checking to see a code's run context to determine certain behaviors that would make sense in a top-level but not an imported call.
-
-# surrogate pair is a javascript thing and python shouldn't allow it without clunky handlers. Just use a 32-bit specification: https://stackoverflow.com/questions/38147259/how-can-i-convert-surrogate-pairs-to-normal-string-in-python
-# print("\U0001f35e") # debug: bread emoji using python syntax for unicode parsing
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets) # On line 11, you create an instance of the Dash class. 
-                          # If you’ve used Flask before, then initializing a Dash class may look familiar. 
-                          # In Flask, you usually initialize a WSGI application using Flask(__name__). 
-                          # Similarly, for a Dash app, you use Dash(__name__).
-                          # (i.e., this is boilerplate which initializes the class housing your dang app!)
+]
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = "Avocado Analytics: Grab Some \U0001f35e Toast \U0001f35e"
-# define the app html markup (which needs to happen inside app.layout!!!)
-# the html tools are funny, since it doesn't really save you time, just puts it all in your python context. which I guess helps psychologically anyway.
-
-# less-scalable text styling
-# style = dict([
-#   (propname,propval),
-#   (propname,propval)
-# ])
+server = app.server # needed for deployment
 
 app.layout = html.Div(
-    children=[        
-        html.H1(children="Avocado Analytics",
-                className="header-title",
+    children=[
+        html.Div(
+            children=[
+                html.P(children="\U0001f951", className="header-emoji"),
+                html.H1(
+                    children="Avocado Analytics", className="header-title"
+                ),
+                html.P(
+                    children="Analyze the behavior of avocado prices"
+                    " and the number of avocados sold in the US"
+                    " between 2015 and 2018",
+                    className="header-description",
+                ),
+            ],
+            className="header",
         ),
-        
-        html.P(
-            children="Analyze the behavior of avocado prices"
-            " and the number of avocados sold in the US"
-            " between 2015 and 2018",
+        html.Div(
+            children=[
+                html.Div(
+                    children=[
+                        html.Div(children="Region", className="menu-title"),
+                        dcc.Dropdown(
+                            id="region-filter",
+                            options=[
+                                {"label": region, "value": region}
+                                for region in np.sort(data.region.unique())
+                            ],
+                            value="Albany",
+                            clearable=False,
+                            className="dropdown",
+                        ),
+                    ]
+                ),
+                html.Div(
+                    children=[
+                        html.Div(children="Type", className="menu-title"),
+                        dcc.Dropdown(
+                            id="type-filter",
+                            options=[
+                                {"label": avocado_type, "value": avocado_type}
+                                for avocado_type in data.type.unique()
+                            ],
+                            value="organic",
+                            clearable=False,
+                            searchable=False,
+                            className="dropdown",
+                        ),
+                    ],
+                ),
+                html.Div(
+                    children=[
+                        html.Div(
+                            children="Date Range",
+                            className="menu-title"
+                            ),
+                        dcc.DatePickerRange(
+                            id="date-range",
+                            min_date_allowed=data.Date.min().date(),
+                            max_date_allowed=data.Date.max().date(),
+                            start_date=data.Date.min().date(),
+                            end_date=data.Date.max().date(),
+                        ),
+                    ]
+                ),
+            ],
+            className="menu",
         ),
-        
-        dcc.Graph(
-            figure={
-                "data": [
-                    {
-                        "x": data["Date"],
-                        "y": data["AveragePrice"],
-                        "type": "lines",
-                        "name": "Weekly Price",
-                    },
-                    {
-                        "x": data["Date"],
-                        "y": data["RollingAveragePrice"],
-                        "type": "lines",
-                        "name": "4-Week Rolling Average Price",
-                    },
-                ],
-                "layout": {"title": "Average Price of Avocados"},
-            },
-        ),
-        dcc.Graph(
-            figure={
-                "data": [
-                    {
-                        "x": data["Date"],
-                        "y": data["Total Volume"],
-                        "type": "lines",
-                        "name": "Weekly Volume"
-                    },
-                    {
-                        "x": data["Date"],
-                        "y": data["RollingAverageVolume"],
-                        "type": "lines",
-                        "name": "4-Week Rolling Average Volume"
-                    },
-                ],
-                "layout": {"title": "Avocados Sold"},
-            }, # Under the hood, Dash uses Plotly.js to generate graphs. 
-            # The dcc.Graph components expect a figure object or a (list of!) 
-            # # Python dictionar(ies!) containing the plot’s data and layout. 
-            # # In this case, you provide the latter.
+        html.Div(
+            children=[
+                html.Div(
+                    children=dcc.Graph(
+                        id="price-chart", config={"displayModeBar": False},
+                    ),
+                    className="card",
+                ),
+                html.Div(
+                    children=dcc.Graph(
+                        id="volume-chart", config={"displayModeBar": False},
+                    ),
+                    className="card",
+                ),
+            ],
+            className="wrapper",
         ),
     ]
 )
 
-# practice corroborated by the official dash documentation: https://dash.plotly.com/deployment
-if __name__ == "__main__": # if this is called as the top-level call (i.e., in a typical debug setting), start a production server (werkzeug) - https://community.plotly.com/t/production-and-development-enviroments/21348
-    # For Development only, otherwise use gunicorn or uwsgi to launch, e.g.
-    # gunicorn -b 0.0.0.0:8050 index:app.server
-    app.run_server(debug=True,port=8888) # debug=True enables dev tools, here is the official documenation: https://dash.plotly.com/reference#app.run_server
+# Input seems to simultaneously define a listener for that property and tie this callback method to a modification thereof.
+@app.callback(
+    [Output("price-chart", "figure"), Output("volume-chart", "figure")],
+    [
+        Input("region-filter", "value"),
+        Input("type-filter", "value"),
+        Input("date-range", "start_date"),
+        Input("date-range", "end_date"),
+    ],
+)
+def update_charts(region, avocado_type, start_date, end_date): # this function is decorated by the at-app.callback above. so it gets called whenever a change in the app is detected. It could totally just be an anonymous method too, or have any arbitrary name.
+    mask = (
+        (data.region == region)
+        & (data.type == avocado_type)
+        & (data.Date >= start_date)
+        & (data.Date <= end_date)
+    )
+    filtered_data = data.loc[mask, :]
     
+    # get rolling averages
+    filtered_data["RollingAveragePrice"] = filtered_data["AveragePrice"].rolling(4,min_periods=1).mean()
+    filtered_data["RollingAverageVolume"] = filtered_data["Total Volume"].rolling(4,min_periods=1).mean()
+    
+    price_chart_figure = {
+        "data": [
+            {
+                "x": filtered_data["Date"],
+                "y": filtered_data["AveragePrice"],
+                "type": "lines",
+                "hovertemplate": "$%{y:.2f}<extra></extra>",
+                "name": "Weekly Average Price",
+            },
+            {
+                "x": filtered_data["Date"],
+                "y": filtered_data["AveragePrice"].rolling(4,min_periods=1).mean(),
+                "type": "lines",
+                "hovertemplate": "$%{y:.2f}<extra></extra>",
+                "name": "4 Week Rolling Average Price",
+            },
+        ],
+        "layout": {
+            "title": {
+                "text": "Average Price of Avocados",
+                "x": 0.05,
+                "xanchor": "left",
+            },
+            "xaxis": {"fixedrange": True},
+            "yaxis": {"tickprefix": "$", "fixedrange": True, "tickformat": "0.2f"},
+            "colorway": ["#CACFCE","#17B897"],
+        },
+    }
+
+    volume_chart_figure = {
+        "data": [
+            {
+                "x": filtered_data["Date"],
+                "y": filtered_data["Total Volume"],
+                "hovertemplate": "%{y:.2s}<extra></extra>",
+                "type": "lines",
+                "name": "Weekly Volume",
+            },
+            {
+                "x": filtered_data["Date"],
+                "y": filtered_data["Total Volume"].rolling(4,min_periods=1).mean(),
+                "hovertemplate": "%{y:.2s}<extra></extra>",
+                "type": "lines",
+                "name": "4 Week Rolling Average Volume",
+            },
+        ],
+        "layout": {
+            "title": {"text": "Avocados Sold", "x": 0.05, "xanchor": "left"},
+            "xaxis": {"fixedrange": True},
+            "yaxis": {"fixedrange": True},
+            "colorway": ["#CACFCE","#E12D39"],
+        },
+    }
+    return price_chart_figure, volume_chart_figure
+
+
+if __name__ == "__main__":
+    app.run_server(debug=True,port=8888)
