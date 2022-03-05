@@ -70,3 +70,4 @@ TODO: figure out how to de-deploy and clean up your account...
 
 ## tutorial-snapshot
 I added a snapshot of the html for the webpage I link to up top. For posterity.
+Also added a pdf in case the html is just tooooo dang broken.
