@@ -67,3 +67,6 @@ I'm not using this github-managed repo for this test project anymore, but anothe
 Note to self: see https://devcenter.heroku.com/articles/git-clone-heroku-app for how to clone that. (avocado-app-2022)
 See the app live at https://avocado-app-2022.herokuapp.com/
 TODO: figure out how to de-deploy and clean up your account...
+
+## tutorial-snapshot
+I added a snapshot of the html for the webpage I link to up top. For posterity.
