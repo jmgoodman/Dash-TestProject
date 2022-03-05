@@ -1,0 +1,3 @@
+images are automatically loaded from here
+in addition, you can put your own custom css and javascript files here, which will be served & applied automatically
+(as in, the html constructor will automatically trawl the assets folder and add the proper html tags for including the css styles and js scripts therein... at least that's how I THINK it works)

@@ -1,7 +1,10 @@
+# %%
 import dash
 import dash_core_components as dcc # from dash import dcc
 import dash_html_components as html # from dash import html
 import pandas as pd
+from datetime import timedelta
+import numpy as np
 
 # foreward: find your preferred emoji favicon here: https://favicon.io/emoji-favicons/
 # download it and stuff at LEAST the .ico file into your assets folder, which then gets served automatically
@@ -11,6 +14,21 @@ data = data.query("type == 'conventional' and region == 'Albany'")
 data["Date"] = pd.to_datetime(data["Date"], format="%Y-%m-%d")
 data.sort_values("Date", inplace=True) # inplace = transform original data, don't make a copy
 
+# get rolling averages
+data["RollingAveragePrice"] = data["AveragePrice"].rolling(4,min_periods=1).mean()
+data["RollingAverageVolume"] = data["Total Volume"].rolling(4,min_periods=1).mean()
+
+
+# these data could stand to be smoothed for visual appeal...
+# ...and a cursory glance suggests uniform sampling
+# so, I could probably just use out-of-the-box smoothing routines
+# ...except pandas rolling with datetime argument handles nonuniform sampling out-of-the-box too, I think?
+# ehhh it's a little more complicated than that. see: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rolling.html
+# just assume uniform weekly sampling and your 4-long window for it, mkay?
+# oh HOLY shit the behavior of pandas.rolling is fucking BAFFLING. Sometimes it works, sometimes it shits itself, it all depends on which combinations of non-numeric columns I decide to leave in or not, and I can't make heads or tails of why it can't just consistently ignore non-numeric columns without bugging the hell out
+# but whatever, it works on single columns just fine, so just... apply it when querying those columns below, instead of trying the super buggy operation of applying it to the whole dataframe
+# OR, do it here first so you can plot both at the same time
+# %%
 # add external stylesheet info, add it as an optional second input to dash.Dash
 """
 external_stylesheets = [
@@ -21,7 +39,6 @@ external_stylesheets = [
     },
 ] # so... is this a list of 1 dict? it seems like this framework loves to think of things as lists of dicts (I imagine dicts are how html tags are stored, and naturally you might want to specify a list of html elements for some parts, hence list-of-dicts conventions for at least some parts of the framework, which I imagine percolates elsewhere for, at the very least, consistency's sake. feels clunky though.)
 """
-
 # print("Hello""World") # test, just appends the two strings
 external_stylesheets = [
     dict([
@@ -70,6 +87,13 @@ app.layout = html.Div(
                         "x": data["Date"],
                         "y": data["AveragePrice"],
                         "type": "lines",
+                        "name": "Weekly Price",
+                    },
+                    {
+                        "x": data["Date"],
+                        "y": data["RollingAveragePrice"],
+                        "type": "lines",
+                        "name": "4-Week Rolling Average Price",
                     },
                 ],
                 "layout": {"title": "Average Price of Avocados"},
@@ -82,6 +106,13 @@ app.layout = html.Div(
                         "x": data["Date"],
                         "y": data["Total Volume"],
                         "type": "lines",
+                        "name": "Weekly Volume"
+                    },
+                    {
+                        "x": data["Date"],
+                        "y": data["RollingAverageVolume"],
+                        "type": "lines",
+                        "name": "4-Week Rolling Average Volume"
                     },
                 ],
                 "layout": {"title": "Avocados Sold"},
@@ -97,5 +128,5 @@ app.layout = html.Div(
 if __name__ == "__main__": # if this is called as the top-level call (i.e., in a typical debug setting), start a production server (werkzeug) - https://community.plotly.com/t/production-and-development-enviroments/21348
     # For Development only, otherwise use gunicorn or uwsgi to launch, e.g.
     # gunicorn -b 0.0.0.0:8050 index:app.server
-    app.run_server(debug=True) # debug=True enables dev tools, here is the official documenation: https://dash.plotly.com/reference#app.run_server
+    app.run_server(debug=True,port=8888) # debug=True enables dev tools, here is the official documenation: https://dash.plotly.com/reference#app.run_server
     

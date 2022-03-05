@@ -53,5 +53,6 @@ I used:
 * Finish tutorial, especially the stuff about pretty styling
 * Figure out deployment solution (Google Cloud + Kubernetes? Might be overkill... tutorial suggests Heroku, something the [plotly website](https://dash.plotly.com/deployment) corroborates)
 * Add data of my choosing (maybe yet another covid dashboard? figure out how to query the [github jhu CSSE repository](https://github.com/CSSEGISandData/COVID-19) or some API with the data you want)
+* Maybe even convert those data to a filesystem for SQL queries via php or smth
 * go through [this](https://deeplearning.neuromatch.io/tutorials/W2D5_GenerativeModels/student/W2D5_Tutorial4.html?highlight=deploy) other tutorial to *really* grok what's going on (a lot of similar things going on, except it uses Flask directly, covers some complications if one uses notebooks & colab for development & testing, mentions [ngrok](https://ngrok.com/) as a solution to those problems, and it at least mentions django)
 * speaking of django, try this tutorial: https://docs.djangoproject.com/en/4.0/intro/tutorial01/
