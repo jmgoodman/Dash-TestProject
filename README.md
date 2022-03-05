@@ -60,3 +60,4 @@ I used:
 ## NOTE
 heroku only accepts very specific versions of python: https://devcenter.heroku.com/articles/python-support
 if you don't use one of these, heroku will not deploy your app.
+it also puts everything in a staging repository called "heroku"
