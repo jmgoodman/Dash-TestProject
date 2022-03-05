@@ -59,15 +59,21 @@ I used:
 
 ## NOTE
 heroku only accepts very specific versions of python: https://devcenter.heroku.com/articles/python-support
+
 if you don't use one of these, heroku will not deploy your app.
+
 it also puts everything in a staging repository called "heroku"
 
 ## cloning
 I'm not using this github-managed repo for this test project anymore, but another one managed through pure git.
+
 Note to self: see https://devcenter.heroku.com/articles/git-clone-heroku-app for how to clone that. (avocado-app-2022)
+
 See the app live at https://avocado-app-2022.herokuapp.com/
+
 TODO: figure out how to de-deploy and clean up your account...
 
 ## tutorial-snapshot
 I added a snapshot of the html for the webpage I link to up top. For posterity.
+
 Also added a pdf in case the html is just tooooo dang broken.
