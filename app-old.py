@@ -25,9 +25,8 @@ data["RollingAverageVolume"] = data["Total Volume"].rolling(4,min_periods=1).mea
 # ...except pandas rolling with datetime argument handles nonuniform sampling out-of-the-box too, I think?
 # ehhh it's a little more complicated than that. see: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rolling.html
 # just assume uniform weekly sampling and your 4-long window for it, mkay?
-# oh HOLY shit the behavior of pandas.rolling is fucking BAFFLING. Sometimes it works, sometimes it shits itself, it all depends on which combinations of non-numeric columns I decide to leave in or not, and I can't make heads or tails of why it can't just consistently ignore non-numeric columns without bugging the hell out
-# but whatever, it works on single columns just fine, so just... apply it when querying those columns below, instead of trying the super buggy operation of applying it to the whole dataframe
-# OR, do it here first so you can plot both at the same time
+# the behavior of pandas.rolling is quite BAFFLING. Sometimes it works, sometimes it doesn't, it all depends on which combinations of non-numeric columns I decide to leave in or not
+# the problem seems to be that it was simply never meant to be used with more than one column at once.
 # %%
 # add external stylesheet info, add it as an optional second input to dash.Dash
 """
@@ -46,7 +45,7 @@ external_stylesheets = [
         ('rel','stylesheet')
     ])
 ] # note: the split into two strings earlier didn't do anything, it was just a way to try and make it neater by taking advantage of automatic concatenation of adjacent strings, then splitting them up onto different lines.
-# so this is, indeed, equivalent. idk what this does yet, it doesn't seem to do anything.
+# so this is, indeed, equivalent. idk what this does yet, it doesn't seem to do anything. Maybe it's referenced in the css file I donwloaded?
 
 # print(__name__) # debug / testing, prints __main__ when app.py is a top-level call and not imported from a script higher up in the chain. I am dumb and do not yet see the utility of this, but it seems awfully fundamental. Its typical use cases seem related to checking to see a code's run context to determine certain behaviors that would make sense in a top-level but not an imported call.
 
@@ -72,17 +71,10 @@ app.title = "Avocado Analytics: Grab Some \U0001f35e Toast \U0001f35e"
 # "displaymodebar" toggles whether the plot visualization toolbar (pan, zoom, etc.) shows up (ideally you curate the style yourself and hide this clutter from the user)
 # manually giving <extra> tags to the hovertemplate lets you control the info that pops up NEXT to the value - default is to display the variable name from the legend (specified in the "name" entry). Having this empty reduces clutter.
 # I never explicitly define "header" class in my css file, so I assume this is given in the external stylesheet I imported above...
-# ...nope, that is not the case. Where the HELL is this tutorial getting its "header" from, then?!?!?!?!?!?!?!?!?!?
-# why does className="header" in the first div element fucking WORK????
-# (note: this code works whether or not you include that line... I HAVE to assume it's using a default header css style of SOME sort, probably the bog html standard then)
 # no "%" symbols in tick formats unless you want % literals
-# tutorial is an asshole and repeats the outer div & children layers of the app layout for no fucking reason
 # classname card makes a box for the plot to be in
 # classname wrapper imposes a max width fixed margins on its contents
-# I straight-up cannot format the bottom plot the way I want because Plotly does not document the number formatting strings fucking ANYWHERE
-# seriously, where do I look up what .3s and .2f do? I'm broadly familiar with (int).f=float 3 digits in this context, but .s is VERY new to me and does NOT seem standard. Meanwhile, the standard "d" formatting code does NOT work. So I just have NO reference for what's going on and plotly just fucking assumes that I'll just be on their fucking wavelength...
-# well, it feels wrong as hell, but I cannot for the life of me find the documentation for any of this shit. So I guess the proper plotly way to format numbers as integers is .0f!!!!!!
-# okay, I found the docs after all: https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_forma
+# okay, I found the docs for numeric formatting based on the d3 standard: https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_forma
 # and for datetime: https://github.com/d3/d3-time-format
 app.layout = html.Div(
     children=[        
