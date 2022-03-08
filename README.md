@@ -1,5 +1,7 @@
 # Dash-TestProject
  Avocado prices over time. From: https://realpython.com/python-dash/
+ 
+ See the app live at https://avocado-app-2022.herokuapp.com/
 
 ## What is your dev environment?
 I used:
@@ -68,8 +70,6 @@ it also puts everything in a staging repository called "heroku"
 I'm not using this github-managed repo for this test project anymore, but another one managed through pure git.
 
 Note to self: see https://devcenter.heroku.com/articles/git-clone-heroku-app for how to clone that. (avocado-app-2022)
-
-See the app live at https://avocado-app-2022.herokuapp.com/
 
 TODO: figure out how to de-deploy and clean up your account...
 
